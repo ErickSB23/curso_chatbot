@@ -1,4 +1,4 @@
-from flask import Flask,request, render_template
+from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -48,10 +48,19 @@ def webhook():
         return response
         
 def verificar_token(req):
-    return 0
+    token = req.args.get('hub.veryfy_token')
+    challenge =req.args.get('hub.chalenge')
+    
+    if challenge and token == token_code:
+        return challenge
+    else:
+        return jsonify({'error': 'Toke Invalido'}),401
+    
 
 def recibir_mensajes(req):
-        return 0
+    req = request.get_json()
+    agregar_mensajes_log(req)
+    return jsonify({'message':'EVENT_RECEIVED'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
